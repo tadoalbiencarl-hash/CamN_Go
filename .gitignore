@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+*.local
+.DS_Store
+# Never commit real customer data or ID images:
+private/
+id-uploads/
+*.sql.bak
