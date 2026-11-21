@@ -39,12 +39,14 @@
   function markMissing(img) { var m = img.closest('.media'); if (m) m.classList.add('missing'); }
   function initImages() {
     document.addEventListener('error', function (e) { if (e.target.tagName === 'IMG') markMissing(e.target); }, true);
+    // A photo that loads successfully always clears the placeholder.
+    document.addEventListener('load', function (e) { if (e.target.tagName === 'IMG') { var m = e.target.closest('.media'); if (m) m.classList.remove('missing'); } }, true);
     document.querySelectorAll('.media img').forEach(function (i) { if (i.complete && i.naturalWidth === 0) markMissing(i); });
   }
 
   function card(c) {
     return '<article class="card"><div class="media" data-label="' + c.name + '" data-file="' + c.image.split('/').pop() + '">' +
-      '<img src="' + c.image + '" alt="' + c.name + ' camera" loading="lazy"></div>' +
+      '<img src="' + c.image + '" alt="' + c.name + ' camera"></div>' +
       '<div><span class="badge ok">' + (c.available ? 'Available (demo)' : 'Unavailable (demo)') + '</span></div>' +
       '<h3>' + c.name + '</h3><p>' + c.desc + '</p>' +
       '<div class="price">' + peso(RATE_SHORT) + ' <small>/ day, 1\u20133 days</small></div>' +
@@ -98,17 +100,17 @@
     var q = new URLSearchParams(location.search), sel = $('#camera');
     CAMERAS.forEach(function (c) { sel.add(new Option(c.name, c.id)); });
     if (q.get('camera')) sel.value = q.get('camera');
-    if (q.get('pickup')) f.pickup.value = q.get('pickup');
+    if (q.get('pickup')) f.elements.pickup.value = q.get('pickup');
     if (q.get('return')) f.elements['return'].value = q.get('return');
     var ret = f.elements['return'];
-    f.pickup.min = ret.min = iso(today());
+    f.elements.pickup.min = ret.min = iso(today());
     var touched = false;
     function validate(show) {
-      var ok = true, p = f.pickup.value, r = ret.value, file = f.idimage.files[0], pd = p && parse(p), rd = r && parse(r);
-      f.pickup.setCustomValidity(pd && pd < today() ? 'Pickup date cannot be in the past.' : '');
+      var ok = true, p = f.elements.pickup.value, r = ret.value, file = f.elements.idimage.files[0], pd = p && parse(p), rd = r && parse(r);
+      f.elements.pickup.setCustomValidity(pd && pd < today() ? 'Pickup date cannot be in the past.' : '');
       ret.setCustomValidity(pd && rd && rd < pd ? 'Return date cannot be before the pickup date.' : (pd && rd && rangeBlocked(pd, rd) ? 'Range includes unavailable (demo) dates.' : ''));
-      f.idimage.setCustomValidity(file ? (['image/jpeg', 'image/png'].indexOf(file.type) < 0 ? 'Please choose a JPG or PNG image.' : file.size > 5 * 1048576 ? 'File must be 5 MB or smaller.' : '') : '');
-      f.phone.setCustomValidity(f.phone.value && !/^(\+63|0)9\d{9}$/.test(f.phone.value.replace(/[\s-]/g, '')) ? 'Enter a valid PH mobile number, e.g. 09XX XXX XXXX.' : '');
+      f.elements.idimage.setCustomValidity(file ? (['image/jpeg', 'image/png'].indexOf(file.type) < 0 ? 'Please choose a JPG or PNG image.' : file.size > 5 * 1048576 ? 'File must be 5 MB or smaller.' : '') : '');
+      f.elements.phone.setCustomValidity(f.elements.phone.value && !/^(\+63|0)9\d{9}$/.test(f.elements.phone.value.replace(/[\s-]/g, '')) ? 'Enter a valid PH mobile number, e.g. 09XX XXX XXXX.' : '');
       f.querySelectorAll('input,select,textarea').forEach(function (el) {
         var e = document.getElementById(el.id + '-err'); if (!e) return;
         if (!el.validity.valid) ok = false;
