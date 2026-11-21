@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Availability | Cam &amp; Go Rentals</title>
+<meta name="description" content="Choose pickup and return dates (demo data).">
+<link rel="stylesheet" href="css/styles.css">
+<script src="js/main.js" defer></script>
+</head>
+<body data-page="availability.html">
+<a class="skip" href="#main">Skip to content</a>
+<div id="site-header"></div>
+<main id="main">
+<section><div class="wrap">
+ <p class="eyebrow">Plan your rental</p><h1>Availability</h1>
+ <div class="notice"><strong>Demonstration data only.</strong> Dates shown here are samples. Selecting dates does not reserve anything.</div>
+ <div class="cal-layout">
+  <div class="cal">
+   <div class="cal-head"><button type="button" id="prev" aria-label="Previous month">&larr;</button><strong id="cal-title" aria-live="polite"></strong><button type="button" id="next" aria-label="Next month">&rarr;</button></div>
+   <div class="cal-grid" id="cal-grid"></div>
+   <div class="legend"><span><i style="background:#fff"></i>Open (demo)</span><span><i style="background:#f1e1dc"></i>Unavailable (demo)</span><span><i style="background:var(--brown)"></i>Selected</span></div>
+  </div>
+  <aside class="summary" aria-label="Selection summary">
+   <h2>Your dates</h2>
+   <dl><dt>Pickup</dt><dd id="s-pick">&mdash;</dd><dt>Return</dt><dd id="s-ret">&mdash;</dd><dt>Days</dt><dd id="s-days">&mdash;</dd><dt>Estimate</dt><dd id="s-cost">&mdash;</dd></dl>
+   <p id="cal-msg" aria-live="polite" class="lead" style="font-size:.95rem">Click a pickup date, then a return date.</p>
+   <a class="btn" id="go-apply" href="application.html" aria-disabled="true">Continue to application</a>
+  </aside>
+ </div>
+</div></section>
+</main>
+<div id="site-footer"></div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rental Application | Cam &amp; Go Rentals</title>
+<meta name="description" content="Submit a camera rental application (prototype).">
+<link rel="stylesheet" href="css/styles.css">
+<script src="js/main.js" defer></script>
+</head>
+<body data-page="application.html">
+<a class="skip" href="#main">Skip to content</a>
+<div id="site-header"></div>
+<main id="main">
+<section><div class="wrap" style="max-width:820px">
+ <p class="eyebrow">Step 5 of 6</p><h1>Rental application</h1>
+ <div class="notice"><strong>Prototype only.</strong> Nothing is sent, uploaded, or stored, and submitting does not reserve a camera.</div>
+ <div id="demo-success" class="success" tabindex="-1" hidden>
+  <h2>Demo submission complete</h2>
+  <p>In the real system, your application would now be sent for review. In this prototype nothing was transmitted or saved, and no reservation exists.</p>
+  <button class="btn ghost" id="new-app" type="button">Start another demo application</button>
+ </div>
+ <form id="apply-form" class="form" novalidate>
+  <div><label for="name">Full name <span class="req">*</span></label><input id="name" name="name" required autocomplete="name"><div class="err" id="name-err"></div></div>
+  <div><label for="phone">Contact number <span class="req">*</span></label><input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="09XX XXX XXXX"><div class="err" id="phone-err"></div></div>
+  <div class="full"><label for="email">Email address <span class="req">*</span></label><input id="email" name="email" type="email" required autocomplete="email"><div class="err" id="email-err"></div></div>
+  <div class="full"><label for="address">Address <span class="req">*</span></label><textarea id="address" name="address" rows="2" required autocomplete="street-address"></textarea><div class="err" id="address-err"></div></div>
+  <div class="full"><label for="camera">Selected camera <span class="req">*</span></label><select id="camera" name="camera" required><option value="">Choose a camera</option></select><div class="err" id="camera-err"></div></div>
+  <div><label for="pickup">Preferred pickup date <span class="req">*</span></label><input id="pickup" name="pickup" type="date" required><div class="err" id="pickup-err"></div></div>
+  <div><label for="return">Expected return date <span class="req">*</span></label><input id="return" name="return" type="date" required><div class="err" id="return-err"></div></div>
+  <div class="full" id="estimate" aria-live="polite" style="color:var(--muted)"></div>
+  <div><label for="idtype">Valid ID type <span class="req">*</span></label><select id="idtype" name="idtype" required><option value="">Choose ID type</option><option>Driver's license</option><option>Passport</option><option>UMID</option><option>National ID (PhilSys)</option><option>Other government-issued ID</option></select><div class="err" id="idtype-err"></div></div>
+  <div><label for="idimage">ID image (JPG/PNG, max 5 MB) <span class="req">*</span></label><input id="idimage" name="idimage" type="file" accept="image/jpeg,image/png" required><div class="err" id="idimage-err"></div></div>
+  <div class="full"><div class="check"><input type="checkbox" id="agree" name="agree" required><label for="agree">I have read and agree to the <a href="policies.html" target="_blank" rel="noopener">rental policies</a> <span class="req">*</span></label></div><div class="err" id="agree-err"></div></div>
+  <div class="full"><button class="btn" type="submit">Submit application (demo)</button></div>
+ </form>
+</div></section>
+</main>
+<div id="site-footer"></div>
+</body>
+</html>
