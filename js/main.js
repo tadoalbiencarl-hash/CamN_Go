@@ -7,16 +7,14 @@
     desc: 'Compact travel camera with a 40x optical zoom and 4K video. Pocket-sized and easy for beginners.',
     image: 'assets/images/cameras/canon-sx740.jpg', available: true
   }];
-  var RATE_SHORT = 350, RATE_LONG = 300, LONG_FROM = 4;
+  // Rates and date maths come from shared/js (loaded before this file).
+  var D = window.CamNGo.dates, P = window.CamNGo.pricing;
+  var RATE_SHORT = P.RATES.shortRate, RATE_LONG = P.RATES.longRate;
   var PAGES = [['index.html', 'Home'], ['cameras.html', 'Cameras'], ['availability.html', 'Availability'], ['application.html', 'Apply'], ['policies.html', 'Policies']];
 
   function $(s) { return document.querySelector(s); }
   function peso(n) { return '\u20B1' + n.toLocaleString('en-PH'); }
-  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-  function parse(s) { var p = s.split('-'); return new Date(+p[0], p[1] - 1, +p[2]); }
-  function today() { var t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
-  function daysBetween(a, b) { return Math.round((b - a) / 864e5); }
-  function rentalCost(days) { return days * (days >= LONG_FROM ? RATE_LONG : RATE_SHORT); }
+  var iso = D.toISO, parse = D.parseISO, today = D.today, rentalDays = D.rentalDays, rentalCost = P.rentalCost;
   // DEMONSTRATION ONLY: fake "unavailable" days (8th-10th and 20th-22nd of every month).
   function demoUnavailable(d) { var n = d.getDate(); return (n >= 8 && n <= 10) || (n >= 20 && n <= 22); }
   function rangeBlocked(a, b) { for (var d = new Date(a); d <= b; d.setDate(d.getDate() + 1)) if (demoUnavailable(d)) return true; return false; }
@@ -41,12 +39,14 @@
   function markMissing(img) { var m = img.closest('.media'); if (m) m.classList.add('missing'); }
   function initImages() {
     document.addEventListener('error', function (e) { if (e.target.tagName === 'IMG') markMissing(e.target); }, true);
+    // A photo that loads successfully always clears the placeholder.
+    document.addEventListener('load', function (e) { if (e.target.tagName === 'IMG') { var m = e.target.closest('.media'); if (m) m.classList.remove('missing'); } }, true);
     document.querySelectorAll('.media img').forEach(function (i) { if (i.complete && i.naturalWidth === 0) markMissing(i); });
   }
 
   function card(c) {
     return '<article class="card"><div class="media" data-label="' + c.name + '" data-file="' + c.image.split('/').pop() + '">' +
-      '<img src="' + c.image + '" alt="' + c.name + ' camera" loading="lazy"></div>' +
+      '<img src="' + c.image + '" alt="' + c.name + ' camera"></div>' +
       '<div><span class="badge ok">' + (c.available ? 'Available (demo)' : 'Unavailable (demo)') + '</span></div>' +
       '<h3>' + c.name + '</h3><p>' + c.desc + '</p>' +
       '<div class="price">' + peso(RATE_SHORT) + ' <small>/ day, 1\u20133 days</small></div>' +
@@ -76,15 +76,15 @@
       $('#s-pick').textContent = pick ? pick.toDateString() : '\u2014';
       $('#s-ret').textContent = ret ? ret.toDateString() : '\u2014';
       if (pick && ret) {
-        var days = daysBetween(pick, ret);
+        var days = rentalDays(pick, ret);
         $('#s-days').textContent = days; $('#s-cost').textContent = peso(rentalCost(days));
         go.href = 'application.html?pickup=' + iso(pick) + '&return=' + iso(ret); go.removeAttribute('aria-disabled');
       } else { $('#s-days').textContent = '\u2014'; $('#s-cost').textContent = '\u2014'; go.setAttribute('aria-disabled', 'true'); go.href = 'application.html'; }
     }
     grid.addEventListener('click', function (e) {
       var b = e.target.closest('.day'); if (!b) return; var d = parse(b.dataset.d);
-      if (!pick || ret) { pick = d; ret = null; msg.textContent = 'Now choose your expected return date.'; }
-      else if (d <= pick) { pick = d; msg.textContent = 'Return must be after pickup. Pickup updated.'; }
+      if (!pick || ret) { pick = d; ret = null; msg.textContent = 'Now choose your expected return date (same day = 1 rental day).'; }
+      else if (d < pick) { pick = d; msg.textContent = 'Return cannot be before pickup. Pickup updated.'; }
       else if (rangeBlocked(pick, d)) { msg.textContent = 'That range includes unavailable (demo) dates. Choose a different return date.'; }
       else { ret = d; msg.textContent = 'Dates selected. These are demonstration dates only; nothing is reserved.'; }
       render();
@@ -100,23 +100,23 @@
     var q = new URLSearchParams(location.search), sel = $('#camera');
     CAMERAS.forEach(function (c) { sel.add(new Option(c.name, c.id)); });
     if (q.get('camera')) sel.value = q.get('camera');
-    if (q.get('pickup')) f.pickup.value = q.get('pickup');
+    if (q.get('pickup')) f.elements.pickup.value = q.get('pickup');
     if (q.get('return')) f.elements['return'].value = q.get('return');
     var ret = f.elements['return'];
-    f.pickup.min = ret.min = iso(today());
+    f.elements.pickup.min = ret.min = iso(today());
     var touched = false;
     function validate(show) {
-      var ok = true, p = f.pickup.value, r = ret.value, file = f.idimage.files[0], pd = p && parse(p), rd = r && parse(r);
-      f.pickup.setCustomValidity(pd && pd < today() ? 'Pickup date cannot be in the past.' : '');
-      ret.setCustomValidity(pd && rd && rd <= pd ? 'Return date must be after the pickup date.' : (pd && rd && rangeBlocked(pd, rd) ? 'Range includes unavailable (demo) dates.' : ''));
-      f.idimage.setCustomValidity(file ? (['image/jpeg', 'image/png'].indexOf(file.type) < 0 ? 'Please choose a JPG or PNG image.' : file.size > 5 * 1048576 ? 'File must be 5 MB or smaller.' : '') : '');
-      f.phone.setCustomValidity(f.phone.value && !/^(\+63|0)9\d{9}$/.test(f.phone.value.replace(/[\s-]/g, '')) ? 'Enter a valid PH mobile number, e.g. 09XX XXX XXXX.' : '');
+      var ok = true, p = f.elements.pickup.value, r = ret.value, file = f.elements.idimage.files[0], pd = p && parse(p), rd = r && parse(r);
+      f.elements.pickup.setCustomValidity(pd && pd < today() ? 'Pickup date cannot be in the past.' : '');
+      ret.setCustomValidity(pd && rd && rd < pd ? 'Return date cannot be before the pickup date.' : (pd && rd && rangeBlocked(pd, rd) ? 'Range includes unavailable (demo) dates.' : ''));
+      f.elements.idimage.setCustomValidity(file ? (['image/jpeg', 'image/png'].indexOf(file.type) < 0 ? 'Please choose a JPG or PNG image.' : file.size > 5 * 1048576 ? 'File must be 5 MB or smaller.' : '') : '');
+      f.elements.phone.setCustomValidity(f.elements.phone.value && !/^(\+63|0)9\d{9}$/.test(f.elements.phone.value.replace(/[\s-]/g, '')) ? 'Enter a valid PH mobile number, e.g. 09XX XXX XXXX.' : '');
       f.querySelectorAll('input,select,textarea').forEach(function (el) {
         var e = document.getElementById(el.id + '-err'); if (!e) return;
         if (!el.validity.valid) ok = false;
         e.textContent = show ? el.validationMessage : ''; el.setAttribute('aria-invalid', show && !el.validity.valid);
       });
-      var days = pd && rd && rd > pd ? daysBetween(pd, rd) : 0;
+      var days = pd && rd && rd >= pd ? rentalDays(pd, rd) : 0;
       $('#estimate').textContent = days ? days + ' day(s): estimated ' + peso(rentalCost(days)) + ' (not a confirmed price)' : '';
       return ok;
     }

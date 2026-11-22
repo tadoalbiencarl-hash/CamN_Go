@@ -1,0 +1,7 @@
+{
+  "name": "camngo-rentals",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Cam & Go Rentals - prototype (customer site + future admin). No dependencies.",
+  "scripts": { "test": "node --test" }
+}

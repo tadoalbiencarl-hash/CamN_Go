@@ -1,21 +1,28 @@
-# Cam & Go Rentals - Stage 1 (public prototype)
-Static site: HTML5, CSS3, vanilla JS. No build step, no dependencies, no network calls. Bootstrap was intentionally not used.
+# Cam & Go Rentals (prototype)
 
-## Run
-Open `index.html` in a browser, or run `python3 -m http.server 8000` in this folder and visit http://localhost:8000.
+Camera rental management prototype. **Stage 1:** public customer website. **Stage 2A:** project foundations
+(shared logic, tests, documentation). The private admin dashboard comes next (Stage 2B). No backend or real data yet.
 
-## Structure
-- `index.html, cameras.html, availability.html, application.html, policies.html`
-- `css/styles.css` shared styles; `js/main.js` shared header/footer, camera data, calendar, form logic
-- `assets/images/{logo,cameras,banners,icons}` your photos (see `assets/ASSETS.md`)
+> Keep this repository **private**. See `docs/SECURITY.md`.
+
+## Run the customer website
+Open `index.html` in a browser, or run `python3 -m http.server 8000` here and visit http://localhost:8000.
+
+## Run the tests (Node 20+, nothing to install)
+```
+node --test
+```
+
+## Where things are
+- Customer site: `index.html`, `cameras.html`, `availability.html`, `application.html`, `policies.html`, `css/`, `js/`, `assets/`
+- `shared/` design tokens and logic (`shared/js` is public-safe; `shared/internal` is never loaded by the site)
+- `admin/` future dashboard (placeholder) · `tests/` · `docs/` (start at `docs/README.md`)
 
 ## Replace images
-Drop files into `assets/images/...` using the exact names in `assets/ASSETS.md`.
+Put your files in `assets/images/...` using the names in `assets/ASSETS.md`. Missing images show labeled placeholders.
 
 ## Functional vs demo-only
-- Functional: navigation, mobile menu, price estimate (₱350/day for 1-3 days, ₱300/day for 4+; days = return minus pickup), calendar selection, form validation.
-- Demo-only: availability (fake blocked days: 8th-10th and 20th-22nd monthly) and form submission (nothing sent; the ID file is never read or stored).
-- Frontend validation is a convenience, not security. Real checks must happen server-side later.
-
-## Still undecided (marked "Pending approval" on the policies page)
-Extension fee, overdue fee, deposit, cancellation terms, pickup location/hours. Contact details and social links in the footer are placeholders.
+- Functional: navigation, mobile menu, price estimate, calendar selection, form validation.
+- Demo-only: availability (fake blocked days: 8th-10th and 20th-22nd monthly) and form submission (nothing is sent or stored; the ID file is never read).
+- Rates: ₱350/day for 1-3 days, ₱300/day for 4+ days. Days are counted inclusively (Mon-Wed = 3; same day = 1). Working assumptions pending owner review.
+- Frontend validation is a convenience, not security.
